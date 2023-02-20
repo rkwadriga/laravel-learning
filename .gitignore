@@ -21,3 +21,8 @@ Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
+
+/.idea
+/.docker/composer/tmp
+/.docker/php/logs
+composer.lock
