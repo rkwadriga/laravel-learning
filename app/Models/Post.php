@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 /**
  * @property int $id
@@ -20,12 +22,17 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property User $user
  * @property array<Photo> $photos
  * @property array<Tag> $tags
+ *
+ * @throws ModelNotFoundException
+ * @method static Post findOrFail(int $id)
  */
 class Post extends Model
 {
     use HasFactory;
 
-     public function user(): BelongsTo
+    protected $fillable = ['title', 'content'];
+
+    public function user(): BelongsTo
      {
          return $this->belongsTo(User::class);
      }

@@ -5,25 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
- * @property string $path
- * @property int $image_able_id
- * @property string $image_able_type
+ * @property int $user_id
+ * @property string $name
  * @property string $created_at
  * @property string $updated_at
  *
  * @throws ModelNotFoundException
- * @method static Photo findOrFail(int $id)
+ * @property User $user
+ *
+ * @method static Address findOrFail(int $id)
  */
-class Photo extends Model
+class Address extends Model
 {
     use HasFactory;
 
-    public function imageAble(): MorphTo
+    protected $fillable = ['name'];
+
+    public function user(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(User::class);
     }
 }

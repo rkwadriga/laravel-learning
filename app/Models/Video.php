@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -13,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property string $updated_at
  *
  * @property array<Tag> $tags
+ *
+ * @throws ModelNotFoundException
+ * @method static Video findOrFail(int $id)
  */
 class Video extends Model
 {

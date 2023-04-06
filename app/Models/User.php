@@ -5,6 +5,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -25,6 +26,10 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property array<Role> $roles
  * @property array<Post> $posts
  * @property array<Photo> $photos
+ * @property array<Address> $addresses
+ *
+ * @throws ModelNotFoundException
+ * @method static User findOrFail(int $id)
  */
 class User extends Authenticatable
 {
@@ -73,5 +78,10 @@ class User extends Authenticatable
     public function photos(): MorphMany
     {
         return $this->morphMany(Photo::class, 'image_able');
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 }
