@@ -14,7 +14,7 @@
 
     <br />
     <br />
-    @include('post.delete_form')
+    @include('post.__delete')
 @endsection
 
 
