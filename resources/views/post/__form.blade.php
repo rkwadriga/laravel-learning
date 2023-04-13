@@ -1,15 +1,16 @@
 <?php
 /**
  * @var App\Models\Post|null $post
+ * @var Illuminate\Support\ViewErrorBag $errors
  */
 
 if (!isset($post)) {
     $post = null;
-    $url = route('post.create');
+    $url = route('post.store');
     $method = 'POST';
     $submitBtnText = 'Create';
 } else {
-    $url = route('post.update', $post->id);
+    $url = route('post.edit', $post->id);
     $method = 'PUT';
     $submitBtnText = 'Update';
 }
@@ -30,3 +31,13 @@ if (!isset($post)) {
         {!! Form::submit($submitBtnText, ['class' => 'btn btn-primary']) !!}
     </div>
 {!! Form::close() !!}
+
+@if ($errors->count() > 0)
+    <div class="alert alert-danger">
+        <ul>
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif

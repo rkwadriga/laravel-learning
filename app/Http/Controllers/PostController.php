@@ -3,16 +3,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Address;
-use App\Models\Country;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 use App\Models\Post;
-use App\Models\Tag;
-use App\Models\Video;
-use Illuminate\Database\Eloquent\Collection;
-use Symfony\Component\HttpFoundation\Request as Http;
+use App\Http\Requests\CreatePostRequest;
+use App\Http\Requests\UpdatePostRequest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
 class PostController extends Controller
@@ -39,19 +33,25 @@ class PostController extends Controller
     }
 
     /**
-     * GET|POST /post/create
+     * GET /post/create
      *
-     * @param Request $request
-     * @return View|RedirectResponse
+     * @return View
      */
-    public function create(Request $request): View|RedirectResponse
+    public function create(): View
     {
-        if ($request->getMethod() === Http::METHOD_GET) {
-            return view('post.create');
-        }
+        return view('post.create');
+    }
 
+    /**
+     * POST /post
+     *
+     * @param CreatePostRequest $request
+     * @return RedirectResponse
+     */
+    public function store(CreatePostRequest $request): RedirectResponse
+    {
         $post = new Post();
-        $post->user_id = 1;
+        $post->user_id = 3;
         $post->fill($request->all(['title', 'content']));
         $post->save();
 
@@ -59,19 +59,26 @@ class PostController extends Controller
     }
 
     /**
+     * GET /post/{id}/update
+     *
+     * @param int $id
+     * @return View
+     */
+    public function update(int $id): View
+    {
+        return view('post.update', ['post' => Post::findOrFail($id)]);
+    }
+
+    /**
      * PUT /post/{id}
      *
-     * @param Request $request
+     * @param UpdatePostRequest $request
      * @param int $id
-     * @return View|RedirectResponse
+     * @return RedirectResponse
      */
-    public function update(Request $request, int $id): View|RedirectResponse
+    public function edit(UpdatePostRequest $request, int $id): RedirectResponse
     {
         $post = Post::findOrFail($id);
-
-        if ($request->getMethod() === Http::METHOD_GET) {
-            return view('post.update', ['post' => $post]);
-        }
 
         $post->fill($request->all(['title', 'content']));
         $post->save();

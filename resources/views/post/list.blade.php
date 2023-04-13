@@ -9,7 +9,7 @@ use App\Http\Controllers\PostController;
 @extends('layouts.content')
 
 @section('content')
-    <a href="{{ route('post.create_form') }}">Create a new post</a>
+    <a href="{{ route('post.create') }}">Create a new post</a>
 
     <ul>
         @foreach ($posts as $post)
