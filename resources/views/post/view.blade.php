@@ -7,6 +7,9 @@
 @extends('layouts.content')
 
 @section('content')
+    @if($post->getPhoto() !== null)
+        <img src="{{ $post->getPhoto() }}" alt="{{ basename($post->getPhoto()) }}">
+    @endif
     <h1>ID: {{ $post->id }}</h1>
     <h2>Title: {{ $post->title }}</h2>
     <p>{{ $post->content }}</p>

@@ -14,6 +14,9 @@ use App\Http\Controllers\PostController;
     <ul>
         @foreach ($posts as $post)
             <li>
+                @if($post->getPhoto() !== null)
+                    <img src="{{ $post->getPhoto() }}" alt="{{ basename($post->getPhoto()) }}">
+                @endif
                 <a href="{{ route('post.view', $post->id) }}">
                     ID: {{ $post->id }}, Title: {{ $post->title }}
                 </a>

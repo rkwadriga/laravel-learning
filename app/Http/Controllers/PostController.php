@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Services\PostService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -14,22 +15,28 @@ class PostController extends Controller
     /**
      * GET /posts
      *
+     * @param PostService $postService
      * @return View
      */
-    public function list(): View
+    public function list(PostService $postService): View
     {
-        return view('post.list', ['posts' => Post::all()]);
+        $posts = $postService->getAll();
+
+        return view('post.list', compact('posts'));
     }
 
     /**
      * GET /post/{id}
      *
+     * @param PostService $postService
      * @param int $id
      * @return View
      */
-    public function view(int $id): View
+    public function view(PostService $postService, int $id): View
     {
-        return view('post.view', ['post' => Post::findOrFail($id)]);
+        $post = $postService->getPost($id);
+
+        return view('post.view', compact('post'));
     }
 
     /**
@@ -46,14 +53,14 @@ class PostController extends Controller
      * POST /post
      *
      * @param CreatePostRequest $request
+     * @param PostService $postService
      * @return RedirectResponse
      */
-    public function store(CreatePostRequest $request): RedirectResponse
+    public function store(CreatePostRequest $request, PostService $postService): RedirectResponse
     {
         $post = new Post();
-        $post->user_id = 3;
-        $post->fill($request->all(['title', 'content']));
-        $post->save();
+        $post->user_id = 1;
+        $postService->save($post, $request);
 
         return redirect()->action([self::class, 'view'], ['id' => $post->id]);
     }
@@ -73,15 +80,14 @@ class PostController extends Controller
      * PUT /post/{id}
      *
      * @param UpdatePostRequest $request
+     * @param PostService $postService
      * @param int $id
      * @return RedirectResponse
      */
-    public function edit(UpdatePostRequest $request, int $id): RedirectResponse
+    public function edit(UpdatePostRequest $request, PostService $postService, int $id): RedirectResponse
     {
         $post = Post::findOrFail($id);
-
-        $post->fill($request->all(['title', 'content']));
-        $post->save();
+        $postService->save($post, $request);
 
         return redirect()->action([self::class, 'view'], ['id' => $post->id]);
     }

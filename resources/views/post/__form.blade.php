@@ -16,7 +16,7 @@ if (!isset($post)) {
 }
 ?>
 
-{!! Form::open(['url' => $url, 'method' => $method]) !!}
+{!! Form::open(['url' => $url, 'method' => $method, 'files' => true]) !!}
     <div class="form-group">
         {!! Form::label('Title') !!}
         {!! Form::text('title', $post?->title, ['class' => 'form-control', 'placeholder' => 'Title']) !!}
@@ -25,6 +25,10 @@ if (!isset($post)) {
     <div class="form-group">
         {!! Form::label('Content') !!}
         {!! Form::textarea('content', $post?->content, ['class' => 'form-control', 'placeholder' => 'Content']) !!}
+    </div>
+    <br />
+    <div class="form-group">
+        {!! Form::file('photo', ['class' => 'form-control', 'placeholder' => 'Photo']) !!}
     </div>
     <br />
     <div class="form-group">
