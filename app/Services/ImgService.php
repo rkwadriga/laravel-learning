@@ -6,11 +6,18 @@
 
 namespace App\Services;
 
+use App\Entities\ResizeConfigEntity;
+use App\Exceptions\Img\CanNotCreateBackGroundImgException;
+use App\Exceptions\Img\CanNotCreateFromFileImgException;
+use App\Exceptions\Img\CanNotGetSizeImgException;
+use App\Exceptions\Img\CanNotResizeImgException;
+use App\Exceptions\Img\CanNotSaveImgException;
 use App\Exceptions\Img\FileNotFoundImgException;
 use App\Exceptions\Img\ImgException;
 use App\Exceptions\Img\InvalidFileExtensionImgException;
 use App\Exceptions\Img\InvalidSizeFormatImgException;
 use App\Exceptions\Img\NotAllowedSizeImgException;
+use Exception;
 use GdImage;
 
 class ImgService
@@ -47,77 +54,101 @@ class ImgService
 
     /**
      * @param string $sourcePath
-     * @param string $size
-     * @param bool $inversedSize
+     * @param string|array<string, mixed>|ResizeConfigEntity $size
      * @return string
-     * @throws FileNotFoundImgException
-     * @throws InvalidFileExtensionImgException
-     * @throws InvalidSizeFormatImgException
-     * @throws NotAllowedSizeImgException
+     * @throws ImgException
      */
-    public function resize(string $sourcePath, string $size, bool $inversedSize = false): string
+    public function resize(string $sourcePath, string|array|ResizeConfigEntity $size): string
     {
-        $this->checkSize($size);
+        $config = $this->createConfigEntity($size);
+        $this->checkSize($config->size);
 
         // If resized file already exist - just return it
-        $targetPath = $this->getSizedPath($sourcePath, $size);
+        $targetPath = $this->getSizedPath($sourcePath, $config->getSize());
         if (file_exists($targetPath)) {
             return $targetPath;
         }
 
+        // Check the source file
         if (!file_exists($sourcePath)) {
             throw new FileNotFoundImgException(sprintf('Image "%s" does not exist', $sourcePath));
         }
 
         // If original image size it the same like requested size - just return the original
-        [$sourceW, $sourceH] = getimagesize($sourcePath);
-        [$targetW, $targetH] = $this->getSize($size);
-        if ($inversedSize) {
-            $oldW = $targetW;
-            $targetW = $targetH;
-            $targetH = $oldW;
-        }
+        [$sourceW, $sourceH] = $this->getImageSize($sourcePath);
+        [$targetW, $targetH] = [$config->getWidth(), $config->getHeight()];
         if ($targetW === $sourceW && $targetH === $sourceH) {
             return $sourcePath;
         }
 
         // Calculate new width and height
-        [$newW, $newH, $newX, $newY] = [$sourceW, $sourceH, 0, 0];
+        [$newW, $newH, $newX, $newY] = [$targetW, $targetH, 0, 0];
         [$sourceK, $targetK] = [$sourceW / $sourceH, $targetW / $targetH];
-        if ($sourceK < $targetK) {
-            // Need to make an image wider to make it's width and height ratio as in requested image
-            //$borderW = (int) (($sourceH * $targetK - $sourceW));
-            $newW = (int) ($sourceH * $targetK);
-            $newX = (int) (($sourceH * $targetK - $sourceW) / 2);
-        } else if ($sourceK > $targetK) {
+        if ($sourceK > $targetK) {
             // Need to make an image higher to make it's width and height ratio as in requested image
-            //$borderH = (int) (($sourceW / $targetK - $sourceH));
-            $newH = (int) ($sourceW / $targetK);
-            $newY = (int) (abs($newH - $targetH) / 2);
+            $newH = $targetW / $sourceK;
+            $newY = (int) (abs($targetH - $newH) / 2);
+            $newH = (int) $newH;
+        } else if ($sourceK < $targetK) {
+            // Need to make an image wider to make it's width and height ratio as in requested image
+            $newW = $targetH * $sourceK;
+            $newX = (int) (abs($targetW - $newW) / 2);
+            $newW = (int) $newW;
         }
 
-        dump("{$sourceW}x{$sourceH} => {$targetW}x{$targetH} => {$newW}x{$newH}; x: {$newX}, y: {$newY}; sourceK: {$sourceK}, targetK: {$targetK}");
-
-        // Add borders to original image, resize it and save with a new name
+        // Create the source image from source file and target image with target size
         $src = $this->createImgFromFile($sourcePath);
-        $target = imagecreatetruecolor($targetW, $targetH);
-        imagecopyresampled(
-            $target,
-            $src,
-            $newX,
-            $newY,
-            0,
-            0,
-            $targetW,
-            $targetH,
-            $newW,
-            $newH
+        $target = $this->createBackGroundImage($config);
+
+        // Resize the source image and put it on the target
+        $this->imposeImages(
+            $target, $src,
+            $newX, $newY,
+            $newW, $newH,
+            $sourceW, $sourceH
         );
-        dump($src, $target);
 
         $this->saveImageToFile($target, $targetPath);
 
         return $targetPath;
+    }
+
+    /**
+     * @param string $image
+     * @return array<int>
+     * @throws CanNotGetSizeImgException
+     */
+    private function getImageSize(string $image): array
+    {
+        $error = null;
+        try {
+            $result = getimagesize($image);
+            if ($result === false) {
+                $error = $this->getError();
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+        if ($error !== null) {
+            throw new CanNotGetSizeImgException(
+                sprintf('Can not get the size of image "%s": %s', $image, $error),
+                0,
+                $e ?? null
+            );
+        }
+
+        return [(int) $result[0], (int) $result[1]];
+    }
+
+    private function createConfigEntity(string|array|ResizeConfigEntity $size): ResizeConfigEntity
+    {
+        if (is_string($size)) {
+            return new ResizeConfigEntity(['size' => $size]);
+        } elseif (is_array($size)) {
+            return new ResizeConfigEntity($size);
+        } else {
+            return $size;
+        }
     }
 
     private function getExt(string $path): string
@@ -127,37 +158,161 @@ class ImgService
         return $matches[1];
     }
 
+    /**
+     * @param string $path
+     * @return GdImage
+     * @throws CanNotCreateFromFileImgException
+     */
     private function createImgFromFile(string $path): GdImage
     {
-        switch ($this->getExt($path)) {
-            case self::EXT_JPG:
-            case self::EXT_GPEG:
-                $image = imagecreatefromjpeg($path);
-                break;
-            case self::EXT_PNG:
-                $image = imagecreatefrompng($path);
-                break;
-            default:
-                $image = imagecreatefromgif($path);
-                break;
+        $error = null;
+        try {
+            $image = match ($this->getExt($path)) {
+                self::EXT_JPG, self::EXT_GPEG => imagecreatefromjpeg($path),
+                self::EXT_PNG => imagecreatefrompng($path),
+                default => imagecreatefromgif($path),
+            };
+            if ($image === false) {
+                $error = $this->getError();
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        if ($error !== null) {
+            throw new CanNotCreateFromFileImgException(
+                sprintf('Can not create an image from file "%s": %s', $path, $error),
+                0,
+                $e ?? null
+            );
         }
 
         return $image;
     }
 
-    private function saveImageToFile(GdImage $img, string $targetPath): void
+    /**
+     * @param ResizeConfigEntity $config
+     * @return GdImage
+     * @throws CanNotCreateBackGroundImgException
+     */
+    private function createBackGroundImage(ResizeConfigEntity $config): GdImage
     {
-        switch ($this->getExt($targetPath)) {
-            case self::EXT_JPG:
-            case self::EXT_GPEG:
-                imagejpeg($img, $targetPath);
-                break;
-            case self::EXT_PNG:
-                imagepng($img, $targetPath);
-                break;
-            default:
-                imagegif($img, $targetPath);
-                break;
+        try {
+            $target = imagecreatetruecolor($config->getWidth(), $config->getHeight());
+            if ($target === false) {
+                throw new Exception($this->getError('imagecreatetruecolor error'));
+            }
+
+            // Set the target image background color
+            $transparency = imagecolorallocatealpha(
+                $target,
+                $config->backgroundR,
+                $config->backgroundG,
+                $config->backgroundB,
+                $config->backgroundAlpha
+            );
+            if ($transparency === false) {
+                throw new Exception($this->getError('imagecolorallocatealpha error'));
+            }
+
+            $result = imagefill($target, 0, 0, $transparency);
+            if ($result === false) {
+                throw new Exception($this->getError('imagefill error'));
+            }
+        } catch (Exception $e) {
+            throw new CanNotCreateBackGroundImgException(
+                sprintf(
+                    'Can not create background image with size "%sx%s"',
+                    $config->getWidth(), $config->getHeight()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $target;
+    }
+
+    /**
+     * @param GdImage $target
+     * @param GdImage $source
+     * @param int $newX
+     * @param int $newY
+     * @param int $newW
+     * @param int $newH
+     * @param int $sourceW
+     * @param int $sourceH
+     * @throws CanNotResizeImgException
+     */
+    private function imposeImages(
+        GdImage $target,
+        GdImage $source,
+        int $newX,
+        int $newY,
+        int $newW,
+        int $newH,
+        int $sourceW,
+        int $sourceH
+    ): void {
+        $error = null;
+        try {
+            $result = imagecopyresampled(
+                $target, $source,
+                $newX, $newY,
+                0, 0,
+                $newW, $newH,
+                $sourceW, $sourceH
+            );
+            if ($result === false) {
+                $error = $this->getError('imagecopyresampled error');
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        if ($error !== null) {
+            throw new CanNotResizeImgException(
+                sprintf(
+                    'Can not resize image from "%sx%s" to ""%sx%s"": %s',
+                    $sourceW,
+                    $sourceH,
+                    $newW,
+                    $newH,
+                    $error
+                ),
+                0,
+                $e ?? null
+            );
+        }
+    }
+
+    /**
+     * @param GdImage $img
+     * @param string $path
+     * @throws CanNotSaveImgException
+     */
+    private function saveImageToFile(GdImage $img, string $path): void
+    {
+        $error = null;
+        try {
+            $result = match ($this->getExt($path)) {
+                self::EXT_JPG, self::EXT_GPEG => imagejpeg($img, $path),
+                self::EXT_PNG => imagepng($img, $path),
+                default => imagegif($img, $path),
+            };
+            if ($result === false) {
+                $error = $this->getError();
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        if ($error !== null) {
+            throw new CanNotSaveImgException(
+                sprintf('Can not save image to file "%s": %s', $path, $error),
+                0,
+                $e ?? null
+            );
         }
     }
 
@@ -204,14 +359,13 @@ class ImgService
         }
     }
 
-    /**
-     * @param string $size
-     * @return array<int>
-     */
-    private function getSize(string $size): array
+    private function getError(string $defaultError = 'Unknown error'): string
     {
-        $sizes = explode('x', $size);
-
-        return [(int) $sizes[0], (int) $sizes[1]];
+        $error = error_get_last();
+        if (is_array($error) && isset($error['message'])) {
+            return $error['message'];
+        } else {
+            return $defaultError;
+        }
     }
 }

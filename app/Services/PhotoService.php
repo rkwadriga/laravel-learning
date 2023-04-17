@@ -39,9 +39,9 @@ class PhotoService
         return $photo;
     }
 
-    public function getUrl(Photo $photo, string $size, bool $inversedSize = false): string
+    public function getUrl(Photo $photo, string|array $size): string
     {
-        return '/' . $this->imgService->resize($this->getPhotoPath($photo), $size, $inversedSize);
+        return '/' . $this->imgService->resize($this->getPhotoPath($photo), $size);
     }
 
     public function getPhotoPath(Photo $photo): string

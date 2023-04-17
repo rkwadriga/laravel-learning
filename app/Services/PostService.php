@@ -26,7 +26,7 @@ class PostService
     public function getPost(int $id, string $photoSize = ImgService::MEDIUM_SIZE): Post
     {
         $post = Post::findOrFail($id);
-        $this->setPhoto($post, $photoSize, true);
+        $this->setPhoto($post, $photoSize);
 
         return $post;
     }
@@ -38,16 +38,24 @@ class PostService
     {
         $posts = Post::oldestFirst();
         foreach ($posts as $post) {
-            $this->setPhoto($post, $photoSize, true);
+            $this->setPhoto($post, $photoSize);
         }
 
         return $posts;
     }
 
-    private function setPhoto(Post $post, string $size, bool $inversedSize = false): void
+    private function setPhoto(Post $post, string $size, ?bool $invertedSize = null): void
     {
+        // If there is needed to inverse the image size - convert "size" param to array with resize configuration
+        if ($invertedSize !== null) {
+            $size = [
+                'size' => $size,
+                'invertedSize' => $invertedSize,
+            ];
+        }
+
         if ($post->photos->count() > 0) {
-            $post->setPhoto($this->photoService->getUrl($post->photos[0], $size, $inversedSize));
+            $post->setPhoto($this->photoService->getUrl($post->photos[0], $size));
         }
     }
 }
