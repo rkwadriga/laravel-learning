@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PostController;
 
-Route::get('/', [PostController::class, 'list'])->name('home');
-
 Route::group(['middleware' => 'web'], function () {
+    Route::get('/', [PostController::class, 'list'])->name('home');
+
     /*
     |--------------------------------------------------------------------------
     | Post Routes
@@ -27,3 +27,5 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/post/{id}', [PostController::class, 'view'])->name('post.view');
 });
 
+
+Auth::routes();

@@ -23,7 +23,7 @@ class PostService
         $this->photoService->uploadPhoto($request, $post);
     }
 
-    public function getPost(int $id, string $photoSize = ImgService::MEDIUM_SIZE): Post
+    public function getPost(int $id, string $photoSize = ImgService::BIG_SIZE): Post
     {
         $post = Post::findOrFail($id);
         $this->setPhoto($post, $photoSize);

@@ -9,9 +9,16 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * GET /posts
      *
@@ -58,8 +65,11 @@ class PostController extends Controller
      */
     public function store(CreatePostRequest $request, PostService $postService): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $post = new Post();
-        $post->user_id = 1;
+        $post->user_id = $user->id;
         $postService->save($post, $request);
 
         return redirect()->action([self::class, 'view'], ['id' => $post->id]);
