@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\Admin\IndexController as AdminIndexController;
 
-Route::group(['middleware' => 'web'], function () {
+Route::group(['middleware' => ['auth', 'web']], function () {
     Route::get('/', [PostController::class, 'list'])->name('home');
 
     /*
@@ -27,5 +28,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/post/{id}', [PostController::class, 'view'])->name('post.view');
 });
 
+Route::group(['middleware' => ['auth', 'admin']], function () {
+    Route::get('/admin', [AdminIndexController::class, 'index']);
+});
 
 Auth::routes();

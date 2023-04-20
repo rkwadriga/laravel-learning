@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\RoleEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,6 +35,11 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * @var array<RoleEnum>|null
+     */
+    private ?array $rolesEnum = null;
 
     /**
      * The attributes that are mass assignable.
@@ -83,5 +89,25 @@ class User extends Authenticatable
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function hasRole(RoleEnum $role): bool
+    {
+        return in_array($role, $this->getRoles(), true);
+    }
+
+    /**
+     * @return array<RoleEnum>
+     */
+    public function getRoles(): array
+    {
+        if ($this->rolesEnum == null) {
+            $this->rolesEnum = [RoleEnum::GUEST];
+            foreach ($this->roles as $role) {
+                $this->rolesEnum[] = $role->getEnumValue();
+            }
+        }
+
+        return $this->rolesEnum;
     }
 }
