@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth', 'web']], function () {
 
 Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::get('/admin', [AdminIndexController::class, 'index']);
+    Route::get('/admin/send-mail', [AdminIndexController::class, 'sendMail']);
 });
 
 Auth::routes();
