@@ -15,8 +15,6 @@ class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        dd($request->session());
-
         return 'ADMIN PANEL';
     }
 
