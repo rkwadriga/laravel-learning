@@ -32,7 +32,7 @@ class ImgService
 
     public const EXT_JPG = 'jpg';
 
-    public const EXT_GPEG = 'jpg';
+    public const EXT_GPEG = 'jpeg';
 
     public const EXT_PNG = 'png';
 

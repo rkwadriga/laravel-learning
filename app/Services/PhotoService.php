@@ -48,10 +48,15 @@ class PhotoService
     {
         $typeParts = explode('\\', $photo->image_able_type);
 
+        $subDir = substr((string) $photo->image_able_id, 0, 2);
+        if (strlen($subDir) === 1) {
+            $subDir = '0' . $subDir;
+        }
+
         return implode(DIRECTORY_SEPARATOR, [
             $this->getBasePath(),
             strtolower(last($typeParts)),
-            substr((string) $photo->image_able_id, 0, 2),
+            $subDir,
             $photo->image_able_id,
             $photo->path
         ]);

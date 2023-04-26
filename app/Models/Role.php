@@ -7,6 +7,7 @@ use App\Enums\RoleEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @property int $id
@@ -15,7 +16,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  * @property string $description
  *
  * @throws ModelNotFoundException
- * @method static Role findOrFail(int $id)
+ * @method static Role findOrFail(int|array $id)
+ *
+ * @method static Builder where(string $attribute, mixed $value)
  */
 class Role extends Model
 {
