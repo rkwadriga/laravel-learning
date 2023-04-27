@@ -5,6 +5,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\RoleEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  *
  * @throws ModelNotFoundException
  * @method static User findOrFail(int $id)
+ * @method static Builder where(string $attribute, mixed $value)
  */
 class User extends Authenticatable
 {

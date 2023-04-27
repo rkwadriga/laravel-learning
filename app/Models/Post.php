@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @throws ModelNotFoundException
  * @method static Post findOrFail(int $id)
  * @method static array<Post> oldestFirst()
+ * @method static Builder where(string $attribute, mixed $value)
  */
 class Post extends Model
 {

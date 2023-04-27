@@ -22,6 +22,8 @@ use GdImage;
 
 class ImgService
 {
+    public const GIANT_SIZE = '800x600';
+
     public const BIG_SIZE = '600x300';
 
     public const MEDIUM_SIZE = '300x150';
@@ -39,6 +41,7 @@ class ImgService
     public const EXT_GIF = 'gif';
 
     private const ALLOWED_SIZES = [
+        self::GIANT_SIZE,
         self::BIG_SIZE,
         self::MEDIUM_SIZE,
         self::SMALL_SIZE,

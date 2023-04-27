@@ -22,7 +22,9 @@ class PostController extends Controller
      */
     public function list(PostService $postService): View
     {
-        $posts = $postService->getAll();
+        /** @var User $user */
+        $user = Auth::user();
+        $posts = $postService->getByUser($user);
 
         return view('post.list', compact('posts'));
     }

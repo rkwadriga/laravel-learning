@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PostService
@@ -23,7 +24,7 @@ class PostService
         $this->photoService->uploadPhoto($request, $post);
     }
 
-    public function getPost(int $id, string $photoSize = ImgService::BIG_SIZE): Post
+    public function getPost(int $id, string $photoSize = ImgService::GIANT_SIZE): Post
     {
         $post = Post::findOrFail($id);
         $this->setPhoto($post, $photoSize);
@@ -37,11 +38,30 @@ class PostService
     public function getAll($photoSize = ImgService::MINIMUM_SIZE): array
     {
         $posts = Post::oldestFirst();
+        $this->prepare($posts, $photoSize);
+
+        return $posts;
+    }
+
+    public function getByUser(User $user, $photoSize = ImgService::MINIMUM_SIZE): array
+    {
+        /** @var array<Post> $posts */
+        $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'DESC')->get()->all();
+        $this->prepare($posts, $photoSize);
+
+        return $posts;
+    }
+
+    /**
+     * @param array<Post> $posts
+     * @param string $photoSize
+     * @return void
+     */
+    private function prepare(array $posts, string $photoSize): void
+    {
         foreach ($posts as $post) {
             $this->setPhoto($post, $photoSize);
         }
-
-        return $posts;
     }
 
     private function setPhoto(Post $post, string $size, ?bool $invertedSize = null): void

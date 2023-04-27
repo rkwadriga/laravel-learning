@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,6 +18,7 @@ use
  *
  * @throws ModelNotFoundException
  * @method static Country findOrFail(int $id)
+ * @method static Builder where(string $attribute, mixed $value)
  */
 class Country extends Model
 {

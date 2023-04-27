@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  *
  * @throws ModelNotFoundException
  * @method static Video findOrFail(int $id)
+ * @method static Builder where(string $attribute, mixed $value)
  */
 class Video extends Model
 {
