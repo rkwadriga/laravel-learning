@@ -2,8 +2,6 @@
 /**
  * @var App\Models\Post[] $posts
  */
-
-use App\Http\Controllers\PostController;
 ?>
 
 @extends('layouts.content')

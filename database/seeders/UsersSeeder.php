@@ -37,9 +37,12 @@ class UsersSeeder extends Seeder
                 $subDir = '0' . $subDir;
             }
             $dir = "public/img/user/{$subDir}/{$user->id}";
+            $photos = array_filter(scandir($dir), function (string $file) {
+                return in_array($file, ['.', '..'], true) || str_contains($file, '-') ? null : $file;
+            });
 
             DB::table('photos')->insert([
-                'path' => scandir($dir)[2],
+                'path' => current($photos),
                 'image_able_id' => $user->id,
                 'image_able_type' => User::class,
             ]);

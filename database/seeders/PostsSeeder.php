@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Post;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -23,9 +22,12 @@ class PostsSeeder extends Seeder
                 $subDir = '0' . $subDir;
             }
             $dir = "public/img/post/{$subDir}/{$post->id}";
+            $photos = array_filter(scandir($dir), function (string $file) {
+                return in_array($file, ['.', '..'], true) || str_contains($file, '-') ? null : $file;
+            });
 
             DB::table('photos')->insert([
-                'path' => scandir($dir)[2],
+                'path' => current($photos),
                 'image_able_id' => $post->id,
                 'image_able_type' => Post::class,
             ]);
