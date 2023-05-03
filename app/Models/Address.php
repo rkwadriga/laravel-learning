@@ -9,17 +9,25 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * App\Models\Address
+ *
  * @property int $id
  * @property int $user_id
  * @property string $name
  * @property string $created_at
  * @property string $updated_at
- *
- * @throws ModelNotFoundException
  * @property User $user
- *
- * @method static Address findOrFail(int $id)
- * @method static Builder where(string $attribute, mixed $value)
+ * @throws ModelNotFoundException
+ * @method static Builder|Address findOrFail(int $id)
+ * @method static Builder|Address newModelQuery()
+ * @method static Builder|Address newQuery()
+ * @method static Builder|Address query()
+ * @method static Builder|Address whereCreatedAt($value)
+ * @method static Builder|Address whereId($value)
+ * @method static Builder|Address whereName($value)
+ * @method static Builder|Address whereUpdatedAt($value)
+ * @method static Builder|Address whereUserId($value)
+ * @mixin \Eloquent
  */
 class Address extends Model
 {

@@ -13,21 +13,34 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
+ * App\Models\Post
+ *
  * @property int $id
  * @property int $user_id
  * @property string $title
  * @property string $created_at
  * @property string $updated_at
  * @property string $content
- *
  * @property User $user
  * @property Collection|array<Photo> $photos
  * @property Collection|array<Tag> $tags
- *
  * @throws ModelNotFoundException
- * @method static Post findOrFail(int $id)
- * @method static array<Post> oldestFirst()
- * @method static Builder where(string $attribute, mixed $value)
+ * @property-read int|null $photos_count
+ * @property-read int|null $tags_count
+ * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
+ * @throws ModelNotFoundException
+ * @method static Builder|Post findOrFail(int $id)
+ * @method static Builder|Post newModelQuery()
+ * @method static Builder|Post newQuery()
+ * @method static Builder|Post oldestFirst()
+ * @method static Builder|Post query()
+ * @method static Builder|Post whereContent($value)
+ * @method static Builder|Post whereCreatedAt($value)
+ * @method static Builder|Post whereId($value)
+ * @method static Builder|Post whereTitle($value)
+ * @method static Builder|Post whereUpdatedAt($value)
+ * @method static Builder|Post whereUserId($value)
+ * @mixin \Eloquent
  */
 class Post extends Model
 {

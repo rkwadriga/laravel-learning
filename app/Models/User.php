@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
+ * App\Models\User
+ *
  * @property int $id
  * @property string $name
  * @property string $email
@@ -24,15 +26,35 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property int $remember_token
  * @property string $created_at
  * @property string $updated_at
- *
  * @property array<Role> $roles
  * @property array<Post> $posts
  * @property array<Photo> $photos
  * @property array<Address> $addresses
- *
+ * @property int|null $country_id
+ * @property-read int|null $addresses_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read int|null $photos_count
+ * @property-read int|null $posts_count
+ * @property-read int|null $roles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @throws ModelNotFoundException
- * @method static User findOrFail(int $id)
- * @method static Builder where(string $attribute, mixed $value)
+ * @method static Builder|User findOrFail(int $id)
+ * @method static Builder|User newModelQuery()
+ * @method static Builder|User newQuery()
+ * @method static Builder|User query()
+ * @method static Builder|User whereCountryId($value)
+ * @method static Builder|User whereCreatedAt($value)
+ * @method static Builder|User whereEmail($value)
+ * @method static Builder|User whereEmailVerifiedAt($value)
+ * @method static Builder|User whereId($value)
+ * @method static Builder|User whereName($value)
+ * @method static Builder|User wherePassword($value)
+ * @method static Builder|User whereRememberToken($value)
+ * @method static Builder|User whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class User extends Authenticatable
 {

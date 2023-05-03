@@ -10,15 +10,23 @@ use
     Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
+ * App\Models\Country
+ *
  * @property int $id
  * @property string $code
  * @property string $name
- *
  * @property array<Post> $posts
- *
  * @throws ModelNotFoundException
- * @method static Country findOrFail(int $id)
- * @method static Builder where(string $attribute, mixed $value)
+ * @property-read int|null $posts_count
+ * @throws ModelNotFoundException
+ * @method static Builder|Country findOrFail(int $id)
+ * @method static Builder|Country newModelQuery()
+ * @method static Builder|Country newQuery()
+ * @method static Builder|Country query()
+ * @method static Builder|Country whereCode($value)
+ * @method static Builder|Country whereId($value)
+ * @method static Builder|Country whereName($value)
+ * @mixin \Eloquent
  */
 class Country extends Model
 {

@@ -10,15 +10,22 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
+ * App\Models\Role
+ *
  * @property int $id
  * @property string $name
  * @property string $rights
  * @property string $description
- *
  * @throws ModelNotFoundException
- * @method static Role findOrFail(int|array $id)
- *
- * @method static Builder where(string $attribute, mixed $value)
+ * @method static Builder|Role findOrFail(int $id)
+ * @method static Builder|Role newModelQuery()
+ * @method static Builder|Role newQuery()
+ * @method static Builder|Role query()
+ * @method static Builder|Role whereDescription($value)
+ * @method static Builder|Role whereId($value)
+ * @method static Builder|Role whereName($value)
+ * @method static Builder|Role whereRights($value)
+ * @mixin \Eloquent
  */
 class Role extends Model
 {
