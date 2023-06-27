@@ -276,7 +276,7 @@ class ImgService
         if ($error !== null) {
             throw new CanNotResizeImgException(
                 sprintf(
-                    'Can not resize image from "%sx%s" to ""%sx%s"": %s',
+                    'Can not resize image from "%sx%s" to "%sx%s": %s',
                     $sourceW,
                     $sourceH,
                     $newW,
