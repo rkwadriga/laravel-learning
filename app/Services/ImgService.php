@@ -156,9 +156,7 @@ class ImgService
 
     private function getExt(string $path): string
     {
-        preg_match("/^.+\.(\w+)$/", $path, $matches);
-
-        return $matches[1];
+        return pathinfo($path, PATHINFO_EXTENSION);
     }
 
     /**
